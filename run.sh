@@ -17,7 +17,7 @@ for file in "${dae_path}" "${dae_config_path}" "./sub_links"; do
     fi
 done
 
-yes | pacman -U --noconfirm "${dae_path}"
+pacman -U --noconfirm "${dae_path}"
 
 cat "${dae_config_path}" >/etc/dae/config.dae
 
@@ -56,40 +56,26 @@ if [ $dae_success == 0 ]; then
     exit 1
 fi
 
-echo "安装node..."
+echo "安装node & npm..."
 
-if ! command -v nvm &>/dev/null; then
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+pacman -S --noconfirm nodejs npm
 
-    if [ -n "$ZSH_VERSION" ]; then
-        source ~/.zshrc
-    elif [ -n "$BASH_VERSION" ]; then
-        source ~/.bashrc
-    else
-        echo "无法检测到合适的 shell，手动 source 配置文件。"
-        exit 1
-    fi
-fi
-
-nvm install --lts && nvm alias default lts/* && nvm use --lts
-
-if ! command -v node &>/dev/null; then
-    echo "Node安装失败。"
-    exit 1
-fi
-
-echo "安装node成功"
-
-if npm install -g pnpm; then
-    echo "pnpm 安装成功，版本: $(pnpm -v)"
+if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
+    echo "node & npm 已安装"
 else
-    echo "pnpm 安装失败。"
+    echo "node & npm 安装失败"
     exit 1
 fi
 
-if pnpm install; then
-    echo "项目依赖安装成功。"
+echo "安装zx..."
+
+npm install -g zx
+
+if command -v zx >/dev/null 2>&1; then
+    echo "zx 已安装"
 else
-    echo "项目依赖安装失败。"
+    echo "zx 安装失败"
     exit 1
 fi
+
+./index.mjs
