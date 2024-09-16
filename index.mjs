@@ -19,7 +19,7 @@ const installPKG = async (name, commandCheck = false) => {
 const inTmpDir = async (fn) => {
   const pre = await $`pwd`;
   const tmp = await $`mktemp -d`;
-  await $`chmod 777 ${tmp.stdout.slice(0, tmp.stdout.length - 1)}` 
+  await $`chmod 777 ${tmp.stdout.slice(0, tmp.stdout.length - 1)}`;
   await cd(tmp);
   await fn();
   await cd(pre);
@@ -31,7 +31,7 @@ const installAUR = async (url, afterInstall) => {
   await inTmpDir(async () => {
     await $`git clone ${url}`;
     const dir = url.split("/").at(-1).replace(".git", "");
-    await $`chmod 777 ${dir}` 
+    await $`chmod 777 ${dir}`;
     cd(dir);
     await $`sudo -u bsx bash -c 'makepkg --syncdeps'`;
     const p = (await $`ls *.pkg.tar.zst 2>/dev/null | grep -v 'debug'`).stdout;
@@ -54,7 +54,7 @@ await $`sudo -u bsx bash -c 'git config --global user.name "${gitUser}"'`;
 await $`sudo -u bsx bash -c 'git config --global user.email "${gitEmail}"'`;
 
 await $`sudo -u bsx bash -c 'ssh-keygen -t rsa -C "${gitEmail}"'`;
-await $`sudo -u bsx bash -c 'cat ./ssh.conf > ~/.ssh/config'`
+await $`sudo -u bsx bash -c 'cat ./ssh.conf > ~/.ssh/config'`;
 console.log("git OK");
 
 //update dae
@@ -83,10 +83,9 @@ console.log("font OK");
 await $`sudo -u bsx bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash'`;
 console.log("nvm OK");
 
-
 //starship
 await installPKG("starship");
-await $`printf '\neval "$(starship init bash)"\n' | sudo -u bsx bash -c 'tee -a ~/.bashrc > /dev/null'`
+await $`printf '\neval "$(starship init bash)"\n' | sudo -u bsx bash -c 'tee -a ~/.bashrc > /dev/null'`;
 console.log("starship OK");
 
 //bluetooth
