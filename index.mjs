@@ -1,5 +1,19 @@
 #!/usr/bin/env zx
 
+const getOutput = async (res) => {
+  const output = (await res).stdout;
+  return output.endsWith("\n") ? output.slice(0, output.length - 1) : output;
+};
+
+const USER = "bsx";
+const USER_HOME = "/home/bsx";
+const SCRIPT_DIR = await getOutput($`echo $SCRIPT_DIR`);
+
+if (typeof SCRIPT_DIR !== "string" || SCRIPT_DIR.length === 0) {
+  console.error('please run "run.sh"');
+  process.exit(1);
+}
+
 const installPKG = async (name, commandCheck = false) => {
   await $`pacman -S --noconfirm ${name}`;
   if (commandCheck) {
@@ -8,7 +22,7 @@ const installPKG = async (name, commandCheck = false) => {
         for (const n of name) await $`command -v ${n} >/dev/null 2>&1`;
       } else await $`command -v ${name} >/dev/null 2>&1`;
     } catch (e) {
-      console.log(`${name} install failed`);
+      console.error(`${name} install failed`);
       process.exit(e.exitCode);
     }
   }
@@ -19,12 +33,11 @@ const installPKG = async (name, commandCheck = false) => {
 const inTmpDir = async (fn) => {
   const pre = await $`pwd`;
   const tmp = await $`mktemp -d`;
-  await $`chmod 777 ${tmp.stdout.slice(0, tmp.stdout.length - 1)}`;
+  await $`chmod 777 ${await getOutput(tmp)}`;
   await cd(tmp);
   await fn();
   await cd(pre);
-  const tmpPath = tmp.stdout;
-  await $`rm -rf ${tmpPath.endsWith("\n") ? tmpPath.slice(0, tmpPath.length - 1) : tmpPath}`;
+  await $`rm -rf ${await getOutput(tmp)}`;
 };
 
 const installAUR = async (url, afterInstall) => {
@@ -33,9 +46,11 @@ const installAUR = async (url, afterInstall) => {
     const dir = url.split("/").at(-1).replace(".git", "");
     await $`chmod 777 ${dir}`;
     cd(dir);
-    await $`sudo -u bsx bash -c 'makepkg --syncdeps'`;
-    const p = (await $`ls *.pkg.tar.zst 2>/dev/null | grep -v 'debug'`).stdout;
-    await $`pacman -U --noconfirm ${p.slice(0, p.length - 1)}`;
+    await $`sudo -u ${USER} bash -c 'makepkg --syncdeps'`;
+    const p = await getOutput(
+      $`ls *.pkg.tar.zst 2>/dev/null | grep -v 'debug'`,
+    );
+    await $`pacman -U --noconfirm ${p}`;
     afterInstall && (await afterInstall());
   });
 };
@@ -48,13 +63,13 @@ console.log("mirror OK");
 
 //git
 await installPKG(["git", "less"], true);
-const gitConfigResp = await $`cat ./git.conf`;
+const gitConfigResp = await $`cat ${SCRIPT_DIR}/lib/git.conf`;
 const [gitUser, gitEmail] = gitConfigResp.stdout.split("\n");
-await $`sudo -u bsx bash -c 'git config --global user.name "${gitUser}"'`;
-await $`sudo -u bsx bash -c 'git config --global user.email "${gitEmail}"'`;
+await $`sudo -u ${USER} bash -c 'git config --global user.name "${gitUser}"'`;
+await $`sudo -u ${USER} bash -c 'git config --global user.email "${gitEmail}"'`;
 
-await $`sudo -u bsx bash -c 'ssh-keygen -t rsa -C "${gitEmail}"'`;
-await $`sudo -u bsx bash -c 'cat ./ssh.conf > ~/.ssh/config'`;
+await $`sudo -u ${USER} bash -c 'ssh-keygen -t rsa -C "${gitEmail}"'`;
+await $`sudo -u ${USER} bash -c 'cat ${SCRIPT_DIR}/lib/ssh.conf > ${USER_HOME}/.ssh/config'`;
 console.log("git OK");
 
 //update dae
@@ -76,16 +91,17 @@ await inTmpDir(async () => {
   await $`mv ./GeistMono /usr/share/fonts/`;
 });
 
-await $`sudo -u bsx bash -c 'mkdir -p ~/.config/fontconfig/ && cat ./fonts.conf > ~/.config/fontconfig/fonts.conf'`;
+await $`sudo -u ${USER} bash -c 'mkdir -p ${USER_HOME}/.config/fontconfig/ && cat ${SCRIPT_DIR}/lib/fonts.conf > ${USER_HOME}/.config/fontconfig/fonts.conf'`;
 console.log("font OK");
 
 //nvm
-await $`sudo -u bsx bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash'`;
+await $`sudo -u ${USER} bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash'`;
 console.log("nvm OK");
 
 //starship
 await installPKG("starship");
-await $`printf '\neval "$(starship init bash)"\n' | sudo -u bsx bash -c 'tee -a ~/.bashrc > /dev/null'`;
+await $`printf '\neval "$(starship init bash)"\n' | sudo -u ${USER} bash -c 'tee -a ${USER_HOME}/.bashrc > /dev/null'`;
+await $`sudo -u ${USER} bash -c 'cp -f ${SCRIPT_DIR}/lib/starship.toml ${USER_HOME}/.config/starship.toml'`;
 console.log("starship OK");
 
 //bluetooth
@@ -105,11 +121,19 @@ await installPKG([
 await installAUR("https://aur.archlinux.org/fcitx5-pinyin-moegirl.git");
 console.log("input method OK");
 
+//grub theme
+await inTmpDir(async () => {
+  await $`tar -xvf ${SCRIPT_DIR}/lib/Vimix-2k.tar.xz`;
+  cd("Vimix-2k");
+  await $`./install.sh`;
+});
+console.log("grub OK");
+
 //common
 await installAUR("https://aur.archlinux.org/google-chrome.git");
 await installAUR("https://aur.archlinux.org/visual-studio-code-bin.git");
-await installAUR("https://aur.archlinux.org/telegram-desktop-bin.git");
 await installPKG([
+  "telegram-desktop",
   "okular",
   "flameshot",
   "gwenview",
@@ -118,4 +142,5 @@ await installPKG([
   "libreoffice-fresh",
   "libreoffice-fresh-zh-cn",
   "dragon",
+  "dbeaver",
 ]);
