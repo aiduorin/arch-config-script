@@ -109,4 +109,13 @@ console.log("input method OK");
 await installAUR("https://aur.archlinux.org/google-chrome.git");
 await installAUR("https://aur.archlinux.org/visual-studio-code-bin.git");
 await installAUR("https://aur.archlinux.org/telegram-desktop-bin.git");
-await installPKG(["okular", "flameshot", "gwenview"]);
+await installPKG([
+  "okular",
+  "flameshot",
+  "gwenview",
+  "kamoso",
+  "thunderbird",
+  "libreoffice-fresh",
+  "libreoffice-fresh-zh-cn",
+  "dragon",
+]);
