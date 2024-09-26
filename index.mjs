@@ -129,6 +129,12 @@ await inTmpDir(async () => {
 });
 console.log("grub OK");
 
+//vim
+await $`echo -e '\ninoremap jk <Esc>' >> /etc/vimrc`;
+await $`echo -e '\ninoremap kj <Esc>' >> /etc/vimrc`;
+console.log("vim OK");
+
+
 //common
 await installAUR("https://aur.archlinux.org/google-chrome.git");
 await installAUR("https://aur.archlinux.org/visual-studio-code-bin.git");
