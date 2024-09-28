@@ -134,6 +134,12 @@ await $`echo -e '\ninoremap jk <Esc>' >> /etc/vimrc`;
 await $`echo -e '\ninoremap kj <Esc>' >> /etc/vimrc`;
 console.log("vim OK");
 
+//docker
+await installPKG(["docker", "docker-compose"]);
+await $`systemctl enable docker`;
+await $`systemctl start docker`;
+await $`usermod -aG docker ${USER}`;
+console.log("docker OK");
 
 //common
 await installAUR("https://aur.archlinux.org/google-chrome.git");
