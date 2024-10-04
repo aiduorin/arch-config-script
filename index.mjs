@@ -14,6 +14,8 @@ if (typeof SCRIPT_DIR !== "string" || SCRIPT_DIR.length === 0) {
   process.exit(1);
 }
 
+const isLaptop = getOutput($`ls /sys/class/power_supply/`).includes("BAT0");
+
 const installPKG = async (name, commandCheck = false) => {
   await $`pacman -S --noconfirm ${name}`;
   if (commandCheck) {
@@ -141,14 +143,16 @@ await $`systemctl start docker`;
 await $`usermod -aG docker ${USER}`;
 console.log("docker OK");
 
-//battery
-await installPKG(["tlp", "tlp-rdw"]);
-await $`systemctl enable tlp.service`;
-await $`systemctl enable NetworkManager-dispatcher.service`;
-await $`systemctl enable mask systemd-rfkill.service`;
-await $`systemctl enable mask systemd-rfkill.socket`;
-await $`tlp start`;
-console.log("battery OK");
+if (isLaptop) {
+  //battery
+  await installPKG(["tlp", "tlp-rdw"]);
+  await $`systemctl enable tlp.service`;
+  await $`systemctl enable NetworkManager-dispatcher.service`;
+  await $`systemctl enable mask systemd-rfkill.service`;
+  await $`systemctl enable mask systemd-rfkill.socket`;
+  await $`tlp start`;
+  console.log("battery OK");
+}
 
 //common
 await installAUR("https://aur.archlinux.org/google-chrome.git");
