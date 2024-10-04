@@ -62,7 +62,7 @@ await $`pacman -Syu --noconfirm`;
 console.log("mirror OK");
 
 //git
-await installPKG(["git", "less"], true);
+await installPKG(["git", "less", "lazygit"], true);
 const gitConfigResp = await $`cat ${SCRIPT_DIR}/lib/git.conf`;
 const [gitUser, gitEmail] = gitConfigResp.stdout.split("\n");
 await $`sudo -u ${USER} bash -c 'git config --global user.name "${gitUser}"'`;
@@ -140,6 +140,15 @@ await $`systemctl enable docker`;
 await $`systemctl start docker`;
 await $`usermod -aG docker ${USER}`;
 console.log("docker OK");
+
+//battery
+await installPKG(["tlp", "tlp-rdw"]);
+await $`systemctl enable tlp.service`;
+await $`systemctl enable NetworkManager-dispatcher.service`;
+await $`systemctl enable mask systemd-rfkill.service`;
+await $`systemctl enable mask systemd-rfkill.socket`;
+await $`tlp start`;
+console.log("battery OK");
 
 //common
 await installAUR("https://aur.archlinux.org/google-chrome.git");
