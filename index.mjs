@@ -137,12 +137,13 @@ await $`echo -e '\ninoremap kj <Esc>' >> /etc/vimrc`;
 await $`echo -e '\nnu rnu' >> /etc/vimrc`;
 await $`echo -e '\nlet &t_SI = "\e[5 q"' >> /etc/vimrc`;
 await $`echo -e '\nlet &t_EI = "\e[1 q"' >> /etc/vimrc`;
+await $`sudo -u ${USER} bash -c 'cp -f ${SCRIPT_DIR}/lib/.inputrc ${USER_HOME}/.inputrc'`;
 console.log("vim OK");
 
 //docker
 await installPKG(["docker", "docker-compose"]);
-await $`systemctl enable docker`;
-await $`systemctl start docker`;
+await $`systemctl enable docker.socket`;
+await $`systemctl start docker.socket`;
 await $`usermod -aG docker ${USER}`;
 console.log("docker OK");
 
