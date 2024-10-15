@@ -134,6 +134,7 @@ console.log("grub OK");
 //vim
 await $`echo -e '\ninoremap jk <Esc>' >> /etc/vimrc`;
 await $`echo -e '\ninoremap kj <Esc>' >> /etc/vimrc`;
+await $`echo -e '\nnu rnu' >> /etc/vimrc`;
 console.log("vim OK");
 
 //docker
