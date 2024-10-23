@@ -71,6 +71,7 @@ await $`sudo -u ${USER} bash -c 'git config --global user.name "${gitUser}"'`;
 await $`sudo -u ${USER} bash -c 'git config --global user.email "${gitEmail}"'`;
 
 await $`sudo -u ${USER} bash -c 'ssh-keygen -t rsa -C "${gitEmail}"'`;
+await $`cat ${SCRIPT_DIR}/lib/ssh-agent.conf >> ${USER_HOME}/.bashrc`;
 await $`sudo -u ${USER} bash -c 'cat ${SCRIPT_DIR}/lib/ssh.conf > ${USER_HOME}/.ssh/config'`;
 console.log("git OK");
 
