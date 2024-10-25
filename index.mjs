@@ -63,16 +63,17 @@ await $`reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/
 await $`pacman -Syu --noconfirm`;
 console.log("mirror OK");
 
-//git
+//git & ssh
 await installPKG(["git", "less", "lazygit"], true);
 const gitConfigResp = await $`cat ${SCRIPT_DIR}/lib/git.conf`;
 const [gitUser, gitEmail] = gitConfigResp.stdout.split("\n");
 await $`sudo -u ${USER} bash -c 'git config --global user.name "${gitUser}"'`;
 await $`sudo -u ${USER} bash -c 'git config --global user.email "${gitEmail}"'`;
 
+console.log("please enter ssh key password:");
 await $`sudo -u ${USER} bash -c 'ssh-keygen -t rsa -C "${gitEmail}"'`;
 await $`cat ${SCRIPT_DIR}/lib/ssh-agent.conf >> ${USER_HOME}/.bashrc`;
-await $`sudo -u ${USER} bash -c 'cat ${SCRIPT_DIR}/lib/ssh.conf > ${USER_HOME}/.ssh/config'`;
+await $`sudo -u ${USER} bash -c 'cat ${SCRIPT_DIR}/lib/ssh.conf >> ${USER_HOME}/.ssh/config'`;
 console.log("git OK");
 
 //update dae
