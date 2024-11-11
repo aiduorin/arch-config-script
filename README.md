@@ -3,20 +3,10 @@
 
 ## usage
 
-git.conf里填用户名和邮箱
-```
-username
-useremail
-```
 sub_links里添订阅链接
 ```
 "link1"
 "link2"
 ```
-index.mjs里填用户和用户目录
-```
-const USER = "bsx";
-const USER_HOME = "/home/bsx";
-```
-
-最后sudo运行run.sh
+index.sh里填用户、用户目录和邮箱等
+最后sudo运行index.sh
