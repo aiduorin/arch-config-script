@@ -211,6 +211,11 @@ function config_common {
   in_temp_dir install_aur "https://aur.archlinux.org/visual-studio-code-bin.git"
 }
 
+function config_eza {
+  install_pkg "eza"
+  echo -e "\nalias el=\"eza -al --icons --git --git-repos --time-style '+%y/%m/%d'\"\n" >>"${USER_HOME}/.bashrc" || return 1
+}
+
 run_config config_dae || exit 1
 run_config config_mirror || exit 1
 run_config config_ssh
@@ -227,3 +232,4 @@ run_config config_vim
 run_config config_docker
 run_config config_tlp
 run_config config_common
+run_config config_eza
