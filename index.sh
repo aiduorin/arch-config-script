@@ -1,10 +1,10 @@
 #!/bin/bash
 
 readonly SCRIPT_DIR=$(dirname "$(realpath "$0")")
-readonly USER="bsx"
-readonly USER_HOME="/home/bsx"
-readonly GIT_USER="bsx"
-readonly GIT_EMAIL="bsxhomu@outlook.com"
+readonly USER="aiduorin"
+readonly USER_HOME="/home/aiduorin"
+readonly GIT_USER="aiduorin"
+readonly GIT_EMAIL="aiduorin@outlook.com"
 
 function service_check {
   local service=$1
