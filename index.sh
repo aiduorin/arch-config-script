@@ -146,8 +146,8 @@ function config_font {
   mkdir -p "${USER_HOME}/.config/fontconfig/" && cat "${SCRIPT_DIR}/lib/fonts.conf" >"${USER_HOME}/.config/fontconfig/fonts.conf" || return 1
 }
 
-function config_nvm {
-  sudo -u "${USER}" bash -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash" || return 1
+function config_fnm {
+  sudo -u "${USER}" bash -c "curl -fsSL https://fnm.vercel.app/install | bash" || return 1
 }
 
 function config_starship {
@@ -223,7 +223,7 @@ run_config config_git
 run_config update_dae
 run_config config_yay
 run_config config_font
-run_config config_nvm
+run_config config_fnm
 run_config config_starship
 run_config config_bluetooth
 run_config config_input_method
